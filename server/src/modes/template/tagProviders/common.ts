@@ -14,7 +14,7 @@ export interface Attribute {
 export interface AttributeCollector {
   (attribute: string, type?: string, documentation?: string | MarkupContent): void;
 }
-interface StandaloneAttribute {
+export interface StandaloneAttribute {
   label: string;
   type?: string;
   documentation?: string | MarkupContent;
@@ -44,7 +44,7 @@ export interface ITagSet {
 }
 
 export class HTMLTagSpecification {
-  constructor(public documentation: string | MarkupContent, public attributes: Attribute[] = []) {}
+  constructor(public documentation: string | MarkupContent, public attributes: Attribute[] = []) { }
 }
 
 export interface IValueSets {

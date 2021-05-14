@@ -1,4 +1,7 @@
 /* tslint:disable:max-line-length */
+import { findConfigFile } from '../../../utils/workspace';
+import { StandaloneAttribute } from './common';
+import fs from 'fs';
 import {
   HTMLTagSpecification,
   IHTMLTagProvider,
@@ -148,4 +151,42 @@ export function getVueTagProvider(): IHTMLTagProvider {
       collectValuesDefault(tag, attribute, collector, vueTags, vueDirectives, valueSets);
     }
   };
+}
+
+export function getVueCustomTagProvider(packageRoot: string, rootPkgJson: any): IHTMLTagProvider | null {
+  if (!rootPkgJson.vetur) {
+    return null;
+  }
+  const globalAttributesPath = findConfigFile(packageRoot, rootPkgJson.vetur.globalAttributes);
+  try {
+    if (globalAttributesPath) {
+      const directiveJson = JSON.parse(fs.readFileSync(globalAttributesPath, 'utf-8')) as Array<{
+        name: string,
+        tip: string
+      }>;
+      let globalAttributes = new Array<StandaloneAttribute>()
+      directiveJson.forEach(item => {
+        globalAttributes.push(getAttribute(item.name, undefined, item.tip))
+      })
+      console.log("Custom", globalAttributes);
+      return {
+        getId: () => 'vue',
+        priority: Priority.Framework,
+        collectTags: collector => collectTagsDefault(collector, vueTags),
+        collectAttributes: (tag: string, collector: AttributeCollector) => {
+          collectAttributesDefault(tag, collector, vueTags, globalAttributes);
+        },
+        collectValues: (tag: string, attribute: string, collector: (value: string) => void) => {
+          collectValuesDefault(tag, attribute, collector, vueTags, globalAttributes, valueSets);
+        }
+      };
+    }
+    return null;
+  } catch (err) {
+    console.error(err.stack);
+    return null;
+  }
+
+
+
 }

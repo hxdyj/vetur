@@ -1,6 +1,6 @@
 import { IHTMLTagProvider } from './common';
 import { getHTML5TagProvider } from './htmlTags';
-import { getVueTagProvider } from './vueTags';
+import { getVueTagProvider, getVueCustomTagProvider } from './vueTags';
 import { getRouterTagProvider } from './routerTags';
 import {
   elementTagProvider,
@@ -110,6 +110,10 @@ export function getTagProviderSettings(packagePath: string | undefined) {
     const workspaceTagProvider = getWorkspaceTagProvider(packageRoot, rootPkgJson);
     if (workspaceTagProvider) {
       allTagProviders.push(workspaceTagProvider);
+    }
+    const vueCustomTagProvider = getVueCustomTagProvider(packageRoot, rootPkgJson);
+    if (vueCustomTagProvider) {
+      allTagProviders.push(vueCustomTagProvider);
     }
 
     for (const dep of [...Object.keys(dependencies), ...Object.keys(devDependencies)]) {
